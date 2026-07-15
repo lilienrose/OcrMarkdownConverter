@@ -98,7 +98,7 @@ Spusťte kontejner:
  ```
 
 
-# Local Development (Without Docker)
+## Local Development (Without Docker)
 
 Install the .NET 8.0 SDK.
 
