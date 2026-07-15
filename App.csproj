@@ -6,12 +6,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
-<Target Name="CopyNativeLibs" AfterTargets="Build">
-  <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)x64/libleptonica-1.82.0.so" />
-  <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)libleptonica-1.82.0.so" />
-  <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)x64/libtesseract50.so" />
-  <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)libtesseract50.so" />
-</Target>
+
+  <Target Name="CopyNativeLibs" AfterTargets="Build" Condition="'$(BuildingInsideDocker)' != 'true'">
+    <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)x64/libleptonica-1.82.0.so" />
+    <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)libleptonica-1.82.0.so" />
+    <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)x64/libtesseract50.so" />
+    <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)libtesseract50.so" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="12.0.4" />
     <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />

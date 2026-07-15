@@ -1,11 +1,11 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY ["App.csproj", "./"]
-RUN dotnet restore
+RUN dotnet restore -r linux-x64
 
 COPY . .
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o /app/publish -r linux-x64 --self-contained false /p:UseAppHost=false /p:BuildingInsideDocker=true
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
 WORKDIR /app
@@ -15,8 +15,11 @@ RUN apt-get update && apt-get install -y \
     libx11-6 \
     libice6 \
     libsm6 \
-    libext6 \
-    librender1 \
+    libxext6 \
+    libxrender1 \
+    libgtk-3-0 \
+    libdrm2 \
+    libatomic1 \
     libleptonica-dev \
     libtesseract-dev \
     tesseract-ocr \
