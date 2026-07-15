@@ -29,6 +29,9 @@ namespace App
         private readonly object _dictLock = new();
         private List<(string Bad, string Good)> _ocrReplacements = new();
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Initializes the main window, loads OCR rules, and binds event handlers.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         public MainWindow()
         {
             InitializeComponent();
@@ -41,6 +44,9 @@ namespace App
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Loads custom OCR correction rules from a JSON configuration file, or falls back to defaults.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private void LoadOcrRules()
         {
             _ocrReplacements.Clear();
@@ -60,7 +66,7 @@ namespace App
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Chyba při čtení ocr_rules.json: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"Error reading ocr_rules.json: {ex.Message}");
                 }
             }
             
@@ -68,6 +74,9 @@ namespace App
             SaveDefaultOcrRules(configPath);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Populates the OCR replacements list with predefined default mapping rules.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private void LoadDefaultOcrRules()
         {
             _ocrReplacements = new List<(string Bad, string Good)>
@@ -79,6 +88,9 @@ namespace App
             };
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Serializes and saves the current OCR mapping rules to a local JSON file.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private void SaveDefaultOcrRules(string path)
         {
             try
@@ -92,10 +104,13 @@ namespace App
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Nelze uložit výchozí OCR pravidla: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Could not save default OCR rules: {ex.Message}");
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Retrieves or initializes the Czech Hunspell dictionary using a thread-safe lock.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private WordList? GetDictionary()
         {
             if (_czechDictionary != null) return _czechDictionary;
@@ -115,6 +130,9 @@ namespace App
             return _czechDictionary;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Handles the transfer button click, opening a file dialog, processing the document asynchronously, and saving the Markdown output.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private async void TransferOnClick(object? sender, RoutedEventArgs e)
         {
             if (BtnTransfer == null || progressBar == null || TxtResult == null) 
@@ -122,9 +140,9 @@ namespace App
 
             var storage = this.StorageProvider;
             var dialog = await storage.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions {
-                Title = "Otevřít PDF nebo Obrázek",
+                Title = "Open PDF or Image",
                 AllowMultiple = false,
-                FileTypeFilter = new[] { new Avalonia.Platform.Storage.FilePickerFileType("Podporované soubory") { Patterns = new[] { "*.pdf", "*.jpg", "*.jpeg", "*.png" } } }
+                FileTypeFilter = new[] { new Avalonia.Platform.Storage.FilePickerFileType("Supported Files") { Patterns = new[] { "*.pdf", "*.jpg", "*.jpeg", "*.png" } } }
             });
 
             if (dialog == null || dialog.Count == 0) return;
@@ -132,7 +150,7 @@ namespace App
 
             progressBar.IsVisible = true;
             BtnTransfer.IsEnabled = false;
-            TxtResult.Text = "Zpracovávám dokument, prosím čekejte...";
+            TxtResult.Text = "Processing document, please wait...";
 
             try
             {
@@ -140,12 +158,12 @@ namespace App
                 string savePath = Path.ChangeExtension(filePath, ".md");
                 await File.WriteAllTextAsync(savePath, markdown);
 
-                TxtResult.Text = markdown + $"\n\n[INFO: Úspěšně uloženo do {savePath}]";
+                TxtResult.Text = markdown + $"\n\n[INFO: Successfully saved to {savePath}]";
             }
             catch (Exception processError)
             {
                 var realError = processError.InnerException?.Message ?? processError.Message;
-                TxtResult.Text = $"Během zpracování došlo k chybě:\n{realError}";
+                TxtResult.Text = $"An error occurred during processing:\n{realError}";
             }
             finally
             {
@@ -154,6 +172,9 @@ namespace App
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Determines the file type (PDF vs Image) and routes the document to the appropriate text extraction engine (Direct PDF reader or OCR).
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string ProcessDocument(string filePath)
         {
             string ext = Path.GetExtension(filePath).ToLower().Trim();
@@ -191,13 +212,16 @@ namespace App
             }
             
             using var src = Cv2.ImRead(filePath, ImreadModes.Grayscale);
-            if (src.Empty()) throw new Exception("Nepodařilo se načíst obrázek.");
+            if (src.Empty()) throw new Exception("Failed to load the image.");
 
             string singleTessPath = Path.Combine(AppContext.BaseDirectory, "Assets", "tessdata");
             using var singleEngine = new TesseractEngine(singleTessPath, "ces+eng", EngineMode.Default);
             return OcrProcessingMat(src, singleEngine);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Parses directly extracted PDF text, groups letters into logical lines, detects formatting (bold, italics, lists), and identifies headings.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string FormatDirectText(UglyToad.PdfPig.Content.Page page)
         {
             var strBuild = new StringBuilder();
@@ -333,6 +357,9 @@ namespace App
             return strBuild.ToString();
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Flushes any accumulated heading lines into the Markdown output and updates the state.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private static void FlushHeadingIfNeeded(StringBuilder strBuild, List<string> headingLines, ref bool collectingMainHeading)
         {
             if (collectingMainHeading && headingLines.Any())
@@ -342,6 +369,9 @@ namespace App
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Analyzes the text to detect if it contains garbled data, measuring the ratio of malformed/mixed numeric tokens.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private bool IsGarbledText(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return true;
@@ -353,6 +383,9 @@ namespace App
             return (double)garbled / tokens.Length > GARBLED_TEXT_THRESHOLD;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Performs image pre-processing (binarization, blurring), executes the Tesseract OCR engine, and structure-formats the output lines.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string OcrProcessingMat(Mat src, TesseractEngine engine)
         {
             var strBuild = new StringBuilder();
@@ -420,6 +453,9 @@ namespace App
             return ReconstructParagraphs(strBuild.ToString());
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Applies custom heuristics and replacement rules to correct common OCR reading errors before fallback spellchecking.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string TryOcrHeuristics(string word, WordList? dict)
         {
             if (dict == null) return word; 
@@ -465,6 +501,9 @@ namespace App
             return word; 
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Processes a line word-by-word, strips punctuation/formatting, corrects spelling mistakes, and returns the reconstructed line.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string SpellCorrectLine(string line)
         {
             var dict = GetDictionary();
@@ -515,6 +554,9 @@ namespace App
             return string.Join(' ', words);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Calculates the Levenshtein distance (minimum edit operations) between two strings.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private static int EditDistance(string a, string b)
         {
             int[,] dp = new int[a.Length + 1, b.Length + 1];
@@ -528,6 +570,9 @@ namespace App
             return dp[a.Length, b.Length];
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------------------
+        // Reconstructs logical paragraphs from single-line streams, reconnects hyphenated words split at line ends, and runs spellchecking.
+        // -------------------------------------------------------------------------------------------------------------------------------------------
         private string ReconstructParagraphs(string rawText)
         {
             var result = new StringBuilder();
