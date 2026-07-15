@@ -51,6 +51,8 @@ For the application to run correctly, the project must contain the following fil
     ├── libtesseract50.so
     └── libtesseract-5.so
 ```
+
+---
 ## Docker deployment guide
 1. Build the Docker Image
 Run the following command in the root directory of the project:
