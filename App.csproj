@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+<Target Name="CopyNativeLibs" AfterTargets="Build">
+  <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)x64/libleptonica-1.82.0.so" />
+  <Copy SourceFiles="/usr/lib/libleptonica.so.6.0.0" DestinationFiles="$(OutputPath)libleptonica-1.82.0.so" />
+  <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)x64/libtesseract50.so" />
+  <Copy SourceFiles="/usr/lib/libtesseract.so.5" DestinationFiles="$(OutputPath)libtesseract50.so" />
+</Target>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
+    
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260602" />
+    <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.13.0.20260602" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260602" />
+    <PackageReference Include="PdfPig" Version="0.1.15" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <PackageReference Include="WeCantSpell.Hunspell" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Assets/**" CopyToOutputDirectory="Always" />
+    <None Include="x64/**" CopyToOutputDirectory="Always" />
+    <None Include="libdl.so" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+</Project>

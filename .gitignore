@@ -1,0 +1,9 @@
+[Db]in/
+[Ob]ject/
+[Log]s/
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

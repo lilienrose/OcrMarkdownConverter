@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="App.MainWindow"
+        Title="OCR Extractor to Markdown" Width="700" Height="500"
+        WindowStartupLocation="CenterScreen">
+    <Grid RowDefinitions="Auto, Auto, *" Margin="20">
+        <Button Grid.Row="0" Name="BtnTransfer" Content="Select PDF or Image and convert to .md" 
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="12"/>
+        <ProgressBar Grid.Row="1" Name="progressBar" IsIndeterminate="True" IsVisible="False" Margin="0,15,0,15"/>
+        <TextBox Grid.Row="2" Name="TxtResult" Margin="0,10,0,0" 
+                 AcceptsReturn="True" TextWrapping="Wrap" PlaceholderText="Here is the resulting Markdown text when finished..."/>
+    </Grid>
+</Window>
