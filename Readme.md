@@ -1,32 +1,36 @@
-# OCR do Markdown Převodník
+# OCR to Markdown Converter
 
-Desktopová aplikace vytvořená v C# pomocí frameworku Avalonia UI, která slouží k převodu dokumentů (PDF a běžných obrázků) do čistého formátu Markdown (.md).
+A desktop application built in C# using the **Avalonia UI** framework, designed to convert documents (PDFs and common images) into clean, structured **Markdown (.md)** format.
 
-Aplikace inteligentně kombinuje přímé čtení textu z PDF s pokročilým OCR (optickým rozpoznáváním znaků) pomocí knihovny Tesseract. Extrahovaný text následně čistí, automaticky detekuje nadpisy i odrážky, opravuje překlepy pomocí českého slovníku Hunspell a rekonstruuje slova rozdělená spojovníkem na konci řádku.
-
----
-
-## Klíčové vlastnosti
-
-* **Chytré čtení PDF:** Pokud PDF obsahuje textovou vrstvu, aplikace ji přečte přímo. Pokud je stránka naskenovaná, automaticky spustí OCR.
-* **Pokročilé OCR:** Využívá knihovnu Tesseract (s podporou češtiny a angličtiny) a OpenCV pro předzpracování obrazu (Otsuovo prahování, odstranění šumu).
-* **Korekce pravopisu (Spellcheck):** Integrace Hunspell slovníku pro opravu chyb vzniklých při OCR.
-* **Rekonstrukce struktury:** Automatická detekce odstavců, konců řádků, nadpisů různých úrovní, odrážkových seznamů a spojování rozdělených slov na konci řádku.
-* **Multiplatformní nasazení:** Plná podpora běhu v izolovaném prostředí Dockeru.
+The application intelligently combines direct text extraction from PDFs with advanced **OCR (Optical Character Recognition)** using the Tesseract library. The extracted text is then cleaned, automatically detecting headings and bullet points, correcting spelling errors using the Czech Hunspell dictionary, and reconstructing hyphenated words split at the end of lines.
 
 ---
 
-## Požadavky pro spuštění
+## Key Features
 
-Pro spuštění aplikace v Dockeru (doporučená cesta) potřebujete:
-* **Docker Desktop** (nebo Docker Engine)
-* **X-Server** (vyžadováno pro Windows/macOS pro zobrazení grafického rozhraní z kontejneru):
-  * **Windows:** VcXsrv (nebo Xming)
+* **Smart PDF Reading:** If a PDF contains a text layer, the app reads it directly. If the page is scanned, it automatically triggers OCR.
+* **Advanced OCR:** Powered by the **Tesseract** library (supporting both Czech and English) and **OpenCV** for image preprocessing (Otsu's thresholding, noise reduction).
+* **Spellcheck Correction:** Integrated **Hunspell** dictionary to fix typos generated during the OCR process.
+* **Structure Reconstruction:** Automatic detection of paragraphs, line breaks, various heading levels, bulleted lists, and stitching back together hyphenated words at the end of lines.
+* **Cross-platform Deployment:** Full support for running within an isolated **Docker** environment.
+
+---
+
+## Requirements
+
+To run the application via Docker (recommended method), you will need:
+* **Docker Desktop** (or Docker Engine)
+* **X-Server** (required on Windows/macOS to display the GUI from the container):
+  * **Windows:** VcXsrv (or Xming)
   * **macOS:** XQuartz
 
-## Adresářová struktura (Důležité soubory)
+---
 
-Projekt musí pro správný běh obsahovat následující soubory a složky:
+## Directory Structure (Key Files)
+
+For the application to run correctly, the project must contain the following files and folders:
+
+```text
 .
 ├── App.axaml
 ├── App.axaml.cs
@@ -35,7 +39,7 @@ Projekt musí pro správný běh obsahovat následující soubory a složky:
 ├── Assets/
 │   ├── cs_CZ.aff               
 │   ├── cs_CZ.dic              
-│   └── tessdata/
+│   └── tessdata/             
 │       ├── ces.traineddata
 │       └── eng.traineddata
 ├── Dockerfile
@@ -47,46 +51,52 @@ Projekt musí pro správný běh obsahovat následující soubory a složky:
     ├── libtesseract50.so
     └── libtesseract-5.so
 
-## Návod k nasazení přes Docker
-1. Sestavení Docker obrazu
-Spustit v kořenovém adresáři
+## Docker deployment guide
+1. Build the Docker Image
+Run the following command in the root directory of the project:
 
-docker build -t ocr-markdown-app .
+`docker build -t ocr-markdown-app .`
 
-2. Spuštění aplikace
+2. Run the Application
 ## Linux
 
-Povolit přístup k displeji pro Docker a spustit kontejner
+Allow display access for Docker and run the container:
 
-xhost +local:docker
+`xhost +local:docker
 docker run -it --rm \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  ocr-markdown-app
+  ocr-markdown-app`
 
-## Windows
-Spusťte VcXsrv (zvolte Multiple windows, Display number: 0, a zaškrtněte Disable access control).
+##Windows
+Launch VcXsrv (choose Multiple windows, set Display number to 0, and check Disable access control).
 
-Zjistěte svou lokální IP adresu (např. 192.168.1.50).
-Spusťte kontejner (nahraďte IP adresu vaší vlastní):
+Find your local IP address (e.g., 192.168.1.50).
 
-docker run -it --rm -e DISPLAY=192.168.1.50:0.0 ocr-markdown-app
+Run the container (replace the IP address below with your own):
+
+`docker run -it --rm -e DISPLAY=192.168.1.50:0.0 ocr-markdown-app`
 
 ## macOS
 
-Spusťte XQuartz (v Preferences -> Security povolte Allow connections from clients).
-V terminálu povolte připojení
+Launch XQuartz (go to Preferences -> Security and check Allow connections from clients).
 
-    xhost + 127.0.0.1
+In your terminal, authorize the connection:
 
-    Spusťte kontejner:
+   ` xhost + 127.0.0.1 `
 
-docker run -it --rm -e DISPLAY=docker.for.mac.host.internal:0 ocr-markdown-app
+Spusťte kontejner:
+
+`docker run -it --rm -e DISPLAY=docker.for.mac.host.internal:0 ocr-markdown-app`
 
 
-# Lokální vývoj bez Dockeru
-1. Nainstalujte si .NET 8.0 SDK.
-2. Ujistěte se, že máte v systému nainstalované nativní knihovny Tesseract a Leptonica (na Linuxu např. přes apt install libleptonica-dev libtesseract-dev).
-3. Pro obnovu balíčků a spuštění použijte příkazy:
-dotnet restore
-dotnet run
+#Local Development (Without Docker)
+
+Install the .NET 8.0 SDK.
+
+Ensure you have the native Tesseract and Leptonica libraries installed on your system (on Linux, you can install them via sudo apt install libleptonica-dev libtesseract-dev).
+
+Restore dependencies and run the project:
+
+`dotnet restore`
+`dotnet run`
