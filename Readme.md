@@ -91,10 +91,14 @@ In your terminal, authorize the connection:
 
 Spusťte kontejner:
 
-`docker run -it --rm -e DISPLAY=docker.for.mac.host.internal:0 ocr-markdown-app`
+```markdown
+```bash
+ docker run -it --rm -e DISPLAY=docker.for.mac.host.internal:0 \
+ ocr-markdown-app 
+ ```
 
 
-#Local Development (Without Docker)
+# Local Development (Without Docker)
 
 Install the .NET 8.0 SDK.
 
