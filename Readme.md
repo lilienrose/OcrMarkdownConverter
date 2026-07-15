@@ -61,14 +61,16 @@ Run the following command in the root directory of the project:
 ## Linux
 
 Allow display access for Docker and run the container:
-
-`xhost +local:docker
+```markdown
+```bash
+xhost +local:docker 
 docker run -it --rm \
   -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  ocr-markdown-app`
+  ocr-markdown-app
+```
 
-##Windows
+## Windows
 Launch VcXsrv (choose Multiple windows, set Display number to 0, and check Disable access control).
 
 Find your local IP address (e.g., 192.168.1.50).
