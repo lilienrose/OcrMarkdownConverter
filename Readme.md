@@ -1,6 +1,6 @@
 # OCR to Markdown Converter
 
-A desktop application built in C# using the **Avalonia UI** framework, designed to convert documents (PDFs and common images) into clean, structured **Markdown (.md)** format.
+A desktop application built for **https://ekultura.eu/** in C# using the **Avalonia UI** framework, designed to convert documents (PDFs and common images) into clean, structured **Markdown (.md)** format.
 
 The application intelligently combines direct text extraction from PDFs with advanced **OCR (Optical Character Recognition)** using the Tesseract library. The extracted text is then cleaned, automatically detecting headings and bullet points, correcting spelling errors using the Czech Hunspell dictionary, and reconstructing hyphenated words split at the end of lines.
 
